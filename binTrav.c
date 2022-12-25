@@ -1,159 +1,142 @@
-#include <stdio.h>
-#include <stdlib.h>
-struct node {
-  int key;
-  struct node *left, *right;
+#include<stdio.h>
+#include<stdlib.h>
+struct node
+{
+    int data;
+    struct node *left;
+    struct node *right;
 };
-
-struct node *newNode(int item) {
-  struct node *temp = (struct node *)malloc(sizeof(struct node));
-  temp->key = item;
-  temp->left = temp->right = NULL;
-  return temp;
-}
-void inorder(struct node *root) {
-  if (root != NULL) {
-    inorder(root->left);
-    printf("%d -> ", root->key);
-    inorder(root->right);
-  }
-}
-void preorder(struct node *root) {
-  if (root != NULL) {
-    printf("%d -> ", root->key);
-    preorder(root->left);
-    preorder(root->right);
-  }
-}
-void postorder(struct node *root) {
-  if (root != NULL) {
-    postorder(root->left);
-    postorder(root->right);
-    printf("%d ", root->key);
-  }
-}
-struct node *insert(struct node *node, int key) {
-  
-  if (node == NULL) return newNode(key);
- 
-  if (key < node->key)
-    node->left = insert(node->left, key);
-  else
-    node->right = insert(node->right, key);
-
-  return node;
-}
-struct node *minValueNode(struct node *node) {
-  struct node *current = node;
-  while (current && current->left != NULL)
-    current = current->left;
-
-  return current;
-}
-
-struct node *deleteNode(struct node *root, int key) {
-  
-  if (root == NULL) return root;
-  if (key < root->key)
-    root->left = deleteNode(root->left, key);
-  else if (key > root->key)
-    root->right = deleteNode(root->right, key);
-
-  else {
-    if (root->left == NULL) {
-      struct node *temp = root->right;
-      free(root);
-      return temp;
-    } else if (root->right == NULL) {
-      struct node *temp = root->left;
-      free(root);
-      return temp;
+struct node *root;
+void preorder(struct node *root)
+{
+    if (root==NULL)
+    {
+        return;
     }
-    struct node *temp = minValueNode(root->right);
-    root->key = temp->key;
-    root->right = deleteNode(root->right, temp->key);
-  }
-  return root;
+    else
+    {
+        printf("%d ->",root->data);
+        preorder(root->left);
+        preorder(root->right);   
+    }
 }
-
-int search(struct node* root, int value) 
-{ 
-  
-    while (root != NULL){
-
-        if (value > root->key) 
-            root = root->right; 
-
-        else if (value < root->key) 
-            root = root->left; 
+void inorder(struct node *root)
+{
+    if (root==NULL)
+    {
+        return;
+    }
+    else
+    {
+        inorder(root->left);
+        printf("%d ->", root->data);
+        inorder(root->right);   
+    }
+}
+void postorder(struct node *root)
+{
+    if (root==NULL)
+    {
+        return;
+    }
+    else
+    {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ->", root->data);   
+    }
+}
+struct node* createnode()
+{
+    
+    int value;
+    struct node *new=malloc(sizeof(struct node));
+    printf("Enter the value:(-1 for termination)\n");
+    scanf("%d",&value);
+    if (value==-1)
+    {
+        return 0;
+    }
+    new->data=value;
+    printf("Enter the left child of %d\n",value);
+    new->left=createnode();
+    printf("Enter the right child of %d\n",value);
+    new->right=createnode();
+    return new;
+};
+void display()
+{
+    int choice1;
+    printf("Please choose any one option:\n");
+    printf("1.Pre-Order Traversal\n2.In-Order Traversal\n3.Post-Order Traversal\n");
+    scanf("%d",&choice1);
+    switch (choice1)
+    {
+    case 1:
+        printf("PRE-ORDER TRAVERSAL\n");
+        preorder(root);
+        break;
+    case 2:
+        printf("IN-ORDER TRAVERSAL\n");
+        inorder(root);
+        break;
+    case 3:
+        printf("POST-ORDER TRAVERSAL\n");
+        postorder(root);
+        break;
+    default:
+        printf("Wrong Option\n");
+        break;
+    }
+}
+void search(struct node *root,int item)
+{
+    if (root==NULL)
+    {
+        return;
+    }
+    else
+    {
+        if (root->data==item)
+        {
+            printf("Element is present\n");
+            return;
+        }
         else
-            return 1; 
-    } 
-    return 0; 
-} 
-
-int main() {
-  int i,n,val,dval,choice,item;
-  struct node *root = NULL;
-
- do      
-        {  
-            printf("\nSelect one of the operations::\n");  
-            printf("\n1. To insert a new node in the Binary Tree\n");  
-            printf("\n2. To delete a value from tree.\n");  
-            printf("\n3. To search the node in tree\n");
-            printf("\n4. To display the elements in inorder traversal\n");
-            printf("\n5. To display the elements in preorder traversal\n");
-            printf("\n6. To display the elements in postorder traversal\n");
-            scanf("%d",&choice);              
-            switch (choice)  
-            {  
-            case 1 :   
-                printf("Enter the number of elements to add: ");
-                scanf("%d",&n);
-                for(i=0;i<n;i++)
-                {
-                scanf("%d",&val);
-                root = insert(root, val);
-                }                   
-                break;                            
-            case 2 :   
-                printf("Enter an element to delete: ");
-                scanf("%d",&dval);
-                root = deleteNode(root, dval); 
-                break; 
-            case 3 :   
-                
-                printf("Enter an item to search: ");
-                scanf("%d" ,&item);
-                int found = search(root,item);
-
-                if(found)
-                    printf("%d value is found in the tree\t",item);
-                else
-                    printf("%d value not found in the tree\t",item);
-
-            case 4 :   
-                printf("Inorder traversal: ");
-                inorder(root); 
-                break; 
-                 case 5 :   
-                printf("preorder traversal: ");
-                preorder(root); 
-                break; 
-                 case 6 :   
-                printf("postorder traversal: ");
-                postorder(root); 
-                break; 
-            default :   
-                printf("Wrong Entry\n");  
-                break;     
-            }  
-  
-            printf("\nDo you want to continue (Type y or n)\n");  
-            scanf(" %c",&choice);                          
-        } while (choice == 'Y'|| choice == 'y');  
-  
-   return 0;  
-
+        {
+            search(root->left,item);
+            search(root->right,item);
+        }
+    }
+}
+void main()
+{
+    int choice,item;
+    printf("BINARY TREE OPERATIONS\n");
+    while (choice!=0)
+    {
+        printf("Please enter any one option:\n");
+        printf("\n1.Insertion\n2.Traversal\n3.Search\nCaution:\nThis options is based on root node\nPress 0 for Exit\n");
+        scanf("%d",&choice);
+        switch (choice)
+        {
+        case 1:
+            printf("INSERTION\n");
+            root=createnode();
+            break;
+        case 2:
+            printf("TRAVERSAL\n");
+            display();
+            break;
+        case 3:
+            printf("SEARCH\n");
+            printf("Enter the value to search:\n");
+            scanf("%d",&item);
+            search(root,item);
+            break;
+        default:
+            printf("Wrong Option....");
+            break;
+        }
+    }
 }
