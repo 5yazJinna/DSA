@@ -1,142 +1,147 @@
-#include<stdio.h>
-#include<stdlib.h>
-struct node
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct _node node;
+typedef node* node_ptr;
+struct _node
 {
     int data;
-    struct node *left;
-    struct node *right;
+    node_ptr left;
+    node_ptr right;
 };
-struct node *root;
-void preorder(struct node *root)
-{
-    if (root==NULL)
-    {
-        return;
-    }
-    else
-    {
-        printf("%d ->",root->data);
-        preorder(root->left);
-        preorder(root->right);   
-    }
-}
-void inorder(struct node *root)
-{
-    if (root==NULL)
-    {
-        return;
-    }
-    else
-    {
-        inorder(root->left);
-        printf("%d ->", root->data);
-        inorder(root->right);   
-    }
-}
-void postorder(struct node *root)
-{
-    if (root==NULL)
-    {
-        return;
-    }
-    else
-    {
-        postorder(root->left);
-        postorder(root->right);
-        printf("%d ->", root->data);   
-    }
-}
-struct node* createnode()
-{
-    
-    int value;
-    struct node *new=malloc(sizeof(struct node));
-    printf("Enter the value:(-1 for termination)\n");
-    scanf("%d",&value);
-    if (value==-1)
-    {
-        return 0;
-    }
-    new->data=value;
-    printf("Enter the left child of %d\n",value);
-    new->left=createnode();
-    printf("Enter the right child of %d\n",value);
-    new->right=createnode();
-    return new;
-};
-void display()
-{
-    int choice1;
-    printf("Please choose any one option:\n");
-    printf("1.Pre-Order Traversal\n2.In-Order Traversal\n3.Post-Order Traversal\n");
-    scanf("%d",&choice1);
-    switch (choice1)
+
+
+node_ptr create_node(int data);
+void insert(node_ptr* tree, int data);
+void del_tree(node_ptr tree);
+node_ptr search(node_ptr* tree, int data);
+void print_preorder(node_ptr tree);
+void print_postorder(node_ptr tree);
+void print_inorder(node_ptr tree);
+
+int main(){
+  system("cls");
+  node_ptr root = NULL;
+  int c;
+  do
+  {
+    printf("\n1. Insert");
+    printf("\n2. Search");
+    printf("\n3. Print the elements in pre order");
+    printf("\n4. Print the elements in post order");
+    printf("\n5. Print the elements in in order");
+    printf("\n\nEnter '0' to quit.");
+    printf("\n\nEnter choice: ");
+    scanf("%d", &c);
+
+    switch (c)
     {
     case 1:
-        printf("PRE-ORDER TRAVERSAL\n");
-        preorder(root);
+      {
+        int ele;
+        printf("Enter element: ");
+        scanf("%d", &ele);
+        insert(&root, ele);
         break;
+      }
     case 2:
-        printf("IN-ORDER TRAVERSAL\n");
-        inorder(root);
+      {
+        int ele;
+        printf("Enter element: ");
+        scanf("%d", &ele);
+        node_ptr n = search(&root, ele);
+        if(n!=NULL){
+          printf("Element found!\n");
+        }
+        else{
+          printf("Element not found\n");
+        }
         break;
+      }
     case 3:
-        printf("POST-ORDER TRAVERSAL\n");
-        postorder(root);
-        break;
+      print_preorder(root);
+      break;
+    case 4:
+      print_postorder(root);
+      break;
+    case 5:
+      print_inorder(root);
+      break;
     default:
-        printf("Wrong Option\n");
-        break;
+      break;
     }
+  }
+  while(c!=0);
 }
-void search(struct node *root,int item)
-{
-    if (root==NULL)
-    {
-        return;
-    }
-    else
-    {
-        if (root->data==item)
-        {
-            printf("Element is present\n");
-            return;
-        }
-        else
-        {
-            search(root->left,item);
-            search(root->right,item);
-        }
-    }
+
+node_ptr create_node(int data){
+  node_ptr nn = malloc(sizeof(node)); 
+  nn->left=NULL;
+  nn->right=NULL;
+  nn->data=data;
+  return nn;
 }
-void main()
+
+void insert(node_ptr* tree, int data)
 {
-    int choice,item;
-    printf("BINARY TREE OPERATIONS\n");
-    while (choice!=0)
-    {
-        printf("Please enter any one option:\n");
-        printf("\n1.Insertion\n2.Traversal\n3.Search\nCaution:\nThis options is based on root node\nPress 0 for Exit\n");
-        scanf("%d",&choice);
-        switch (choice)
-        {
-        case 1:
-            printf("INSERTION\n");
-            root=createnode();
-            break;
-        case 2:
-            printf("TRAVERSAL\n");
-            display();
-            break;
-        case 3:
-            printf("SEARCH\n");
-            printf("Enter the value to search:\n");
-            scanf("%d",&item);
-            search(root,item);
-            break;
-        default:
-            printf("Wrong Option....");
-            break;
-        }
-    }
+  node_ptr temp = NULL;
+  if(!(*tree)){
+    temp = create_node(data);
+    *tree=temp;
+    printf("Inserted\n");
+    return;
+  }
+
+  if(data < (*tree)->data){
+    insert(&(*tree)->left, data);
+  }else if (data > (*tree)->data){
+    insert(&(*tree)->right, data);
+  }
+}
+
+node_ptr search(node_ptr* tree, int data){
+  if(!(*tree)){
+    return NULL;
+  }
+
+  if(data == (*tree)->data){
+    return *tree;
+  }else if(data < (*tree)->data){
+    search(&(*tree)->left, data);
+  }else if (data > (*tree)->data){
+    search(&(*tree)->right, data);
+  }
+}
+void print_preorder(node_ptr tree)
+{
+  if (tree)
+  {
+    printf("%d\n", tree->data);
+    print_preorder(tree->left);
+    print_preorder(tree->right);
+  }
+}
+
+void print_inorder(node_ptr tree){
+  if(tree){
+    print_inorder(tree->left);
+    printf("%d\n", tree->data);
+    print_inorder(tree->right);
+  }
+}
+
+void print_postorder(node_ptr tree){
+  if(tree){
+    print_postorder(tree->left);
+    print_postorder(tree->right);
+    printf("%d\n", tree->data);
+  }
+}
+
+void del_tree(node_ptr tree){
+  if(tree){
+    tree->left=NULL;
+    tree->right=NULL;
+    free(tree);
+  }
 }
